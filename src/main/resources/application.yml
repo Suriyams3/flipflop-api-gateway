@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: flipflop-api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        # Route 1: Directs traffic to Account Details GraphQL Engine
+        - id: account_details_route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/account-service/**
+          filters:
+            - RewritePath=/account-service/(?<segment>.*), /$\{segment}
+
+        # Route 2: Directs traffic to Credit Card GraphQL Engine
+        - id: credit_card_route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/creditcard-service/**
+          filters:
+            - RewritePath=/creditcard-service/(?<segment>.*), /$\{segment}
+
+        # Route 3: Directs traffic directly to the Offers REST API
+        - id: offers_rest_route
+          uri: http://localhost:8083
+          predicates:
+            - Path=/offers/**
