@@ -8,24 +8,26 @@ spring:
   cloud:
     gateway:
       routes:
-        # Route 1: Directs traffic to Account Details GraphQL Engine
         - id: account_details_route
-          uri: http://localhost:8081
+          # 1. Point this to a standard, clean local property name
+          uri: ${account.service.url}
           predicates:
             - Path=/account-service/**
           filters:
             - RewritePath=/account-service/(?<segment>.*), /$\{segment}
 
-        # Route 2: Directs traffic to Credit Card GraphQL Engine
         - id: credit_card_route
-          uri: http://localhost:8082
+          uri: ${creditcard.service.url}
           predicates:
             - Path=/creditcard-service/**
           filters:
             - RewritePath=/creditcard-service/(?<segment>.*), /$\{segment}
 
-        # Route 3: Directs traffic directly to the Offers REST API
-        - id: offers_rest_route
-          uri: http://localhost:8083
-          predicates:
-            - Path=/offers/**
+# 2. Declare the actual property substitution maps at the root level of the file
+account:
+  service:
+    url: http://${ACCOUNT_SERVICE_HOST:localhost}:8081
+
+creditcard:
+  service:
+    url: http://${CREDITCARD_SERVICE_HOST:localhost}:8082
